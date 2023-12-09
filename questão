@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int codigo;
+    char descricao[50];
+    int quantidade;
+    float valor;
+} Produto;
+
+typedef struct {
+    Produto *produtos;
+    int capacidade;
+    int tamanho;
+} Estoque;
+
+Estoque inicializaEstoque(int capacidade);
+void cadastrarProduto(Estoque *estoque);
+void imprimirRelatorio(Estoque estoque);
+void pesquisarProduto(Estoque estoque);
+void removerProduto(Estoque *estoque);
+
+int main() {
+    Estoque estoque = inicializaEstoque(10); 
+    int escolha;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Cadastrar Produto\n");
+        printf("2. Imprimir Relatório\n");
+        printf("3. Pesquisar Produto\n");
+        printf("4. Remover Produto\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &escolha);
+
+        switch (escolha) {
+            case 1:
+                cadastrarProduto(&estoque);
+                break;
+            case 2:
+                imprimirRelatorio(estoque);
+                break;
+            case 3:
+                pesquisarProduto(estoque);
+                break;
+            case 4:
+                removerProduto(&estoque);
+                break;
+            case 0:
+                break;
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+        }
+    } while (escolha != 0);
+
+    free(estoque.produtos);
+
+    return 0;
+}
+
+Estoque inicializaEstoque(int capacidade) {
+    Estoque estoque;
+    estoque.produtos = (Produto *)malloc(capacidade * sizeof(Produto));
+    estoque.capacidade = capacidade;
+    estoque.tamanho = 0;
+    return estoque;
+}
+
+void cadastrarProduto(Estoque *estoque) {
+    if (estoque->tamanho < estoque->capacidade) {
+        Produto novoProduto;
+
+        printf("Digite o código do produto: ");
+        scanf("%d", &novoProduto.codigo);
+        printf("Digite a descrição do produto: ");
+        scanf(" %[^\n]", novoProduto.descricao);
+        printf("Digite a quantidade do produto: ");
+        scanf("%d", &novoProduto.quantidade);
+        printf("Digite o valor do produto: ");
+        scanf("%f", &novoProduto.valor);
+
+        estoque->produtos[estoque->tamanho++] = novoProduto;
+
+        printf("Produto cadastrado com sucesso.\n");
+    } else {
+        printf("Não há espaço para mais produtos no estoque.\n");
+    }
+}
+
+void imprimirRelatorio(Estoque estoque) {
+    printf("\nRelatório de Produtos:\n");
+    for (int i = 0; i < estoque.tamanho; i++) {
+        printf("Código: %d\n", estoque.produtos[i].codigo);
+        printf("Descrição: %s\n", estoque.produtos[i].descricao);
+        printf("Quantidade: %d\n", estoque.produtos[i].quantidade);
+        printf("Valor: R$ %.2f\n", estoque.produtos[i].valor);
+        printf("-----------------------------\n");
+    }
+}
+
+void pesquisarProduto(Estoque estoque) {
+    int codigoPesquisa;
+    printf("Digite o código do produto para pesquisa: ");
+    scanf("%d", &codigoPesquisa);
+
+    for (int i = 0; i < estoque.tamanho; i++) {
+        if (estoque.produtos[i].codigo == codigoPesquisa) {
+            printf("Produto encontrado:\n");
+            printf("Código: %d\n", estoque.produtos[i].codigo);
+            printf("Descrição: %s\n", estoque.produtos[i].descricao);
+            printf("Quantidade: %d\n", estoque.produtos[i].quantidade);
+            printf("Valor: R$ %.2f\n", estoque.produtos[i].valor);
+            return;
+        }
+    }
+
+    printf("Produto não encontrado.\n");
+}
+
+void removerProduto(Estoque *estoque) {
+    int codigoRemocao;
+    printf("Digite o código do produto a ser removido: ");
+    scanf("%d", &codigoRemocao);
+
+    for (int i = 0; i < estoque->tamanho; i++) {
+        if (estoque->produtos[i].codigo == codigoRemocao) {
+            for (int j = i; j < estoque->tamanho - 1; j++) {
+                estoque->produtos[j] = estoque->produtos[j + 1];
+            }
+
+            estoque->tamanho--;
+            printf("Produto removido com sucesso.\n");
+            return;
+        }
+    }
+
+    printf("Produto não encontrado.\n");
+}
